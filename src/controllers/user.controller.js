@@ -31,7 +31,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with same email already exists");
 
     // check for profile picture
-    // const pf = req.files?.profilePicture[0]?.path;
+    // const pf = req.file?.profilePicture[0]?.path;
     // console.log(pf);
     // if(!pf) throw new ApiError( 404, "Profile picture is required");
     // upload to cloudinary
@@ -69,11 +69,9 @@ const loginUser = asyncHandler(async (req, res) => {
     // check password
     const isPswrdValid = await user.isPasswordValid(password);
     if (!isPswrdValid) throw new ApiError(400, "Invalid cridentials");
-
+    
     // acess and refresh token
     const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
-    // console.log("Access token: ", accessToke);
-    // console.log("Refresh token: ", refreshToken);
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
@@ -134,8 +132,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     // generate new access token
     const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
-
-    // res.status(200).json({ message: "ok" });
 
     user.refreshToken = refreshToken;
     await user.save();
