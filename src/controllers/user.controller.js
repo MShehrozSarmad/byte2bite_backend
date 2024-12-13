@@ -5,11 +5,11 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 const genAccessAndRefreshToken = async (user) => {
     try {
-        const accessToke = await user.genAccessToken();
+        const accessToken = await user.genAccessToken();
         const refreshToken = await user.genRefreshToken();
-        console.log("Access token inner: ", accessToke);
+        console.log("Access token inner: ", accessToken);
         console.log("Refresh token inner: ", refreshToken);
-        return { accessToke, refreshToken };
+        return { accessToken, refreshToken };
     } catch (error) {
         throw new ApiError(500, "Error generating tokens");
     }
@@ -71,9 +71,9 @@ const loginUser = asyncHandler(async (req, res) => {
     if (!isPswrdValid) throw new ApiError(400, "Invalid cridentials");
 
     // acess and refresh token
-    const { accessToke, refreshToken } = await genAccessAndRefreshToken(user);
-    console.log("Access token: ", accessToke);
-    console.log("Refresh token: ", refreshToken);
+    const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
+    // console.log("Access token: ", accessToke);
+    // console.log("Refresh token: ", refreshToken);
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
@@ -88,12 +88,12 @@ const loginUser = asyncHandler(async (req, res) => {
     };
     return res
         .status(200)
-        .cookie("accessToken", accessToke, options)
+        .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
             new ApiResponse(
                 200,
-                { loggedInUser, accessToke, refreshToken },
+                { loggedInUser, accessToken, refreshToken },
                 "User logged in successfully"
             )
         );
@@ -124,9 +124,40 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
-const refreshAccessToke = asyncHandler(async (req, res) => {
+const refreshAccessToken = asyncHandler(async (req, res) => {
     // get refresh token from cookies
-    
-}) 
+    const user = req.user;
+    const incomingRefreshToken = req.incomingRefreshToken;
 
-export { registerUser, loginUser, logoutUser };
+    if (incomingRefreshToken !== user.refreshToken)
+        throw new ApiError(401, "Invalid or expired refresh token");
+
+    // generate new access token
+    const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
+
+    // res.status(200).json({ message: "ok" });
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+    };
+
+    res.status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    accessToken,
+                    refreshToken
+                },
+                "access token refreshed"
+            )
+        );
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken };

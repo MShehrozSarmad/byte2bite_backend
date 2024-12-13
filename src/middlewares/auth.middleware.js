@@ -4,23 +4,31 @@ import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/apiError.js";
 
 const verifyJWT = asyncHandler(async (req, _, next) => {
-    try {
-        const token =
-            req.cookies?.accessToken ||
-            req.header("Authorization")?.replace("Bearer ", "");
+    const token =
+        req.body?.accessToken ||
+        req.cookies?.accessToken ||
+        req.header("Authorization")?.replace("Bearer ", "");
 
-        if (!token) throw new ApiError(401, "unauthorized");
+    console.log(token);
 
+    const incomingRefreshToken = req.cookies?.refreshToken;
+
+    if (!incomingRefreshToken) throw new ApiError(401, "unauthorized request");
+
+    if (token) {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
         const user = await User.findById(decodedToken?._id);
         if (!user) throw new ApiError(401, "Invalid Access Token");
 
         req.user = user;
-        next();
-    } catch (error) {
-        throw new ApiError(500, "Something went wrong while logging out");
+    } else {
+        throw new ApiError(401, "unauthorized request");
+        // or here we will redirect user to refresh tokens
     }
+
+    req.incomingRefreshToken = incomingRefreshToken;
+    next();
 });
 
 export { verifyJWT };
