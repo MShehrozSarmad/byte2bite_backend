@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/apiError.js";
 
+//checks for if user is valid or not by token
 const verifyJWT = asyncHandler(async (req, _, next) => {
     const token =
         req.body?.accessToken ||

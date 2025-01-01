@@ -11,6 +11,7 @@ const router = Router();
 
 // router.route("/register").post( upload.single({name: "profilePicture"}) , registerUser);
 router.route("/register").post(registerUser);
+
 router.route("/login").post(loginUser);
 
 //secure routes

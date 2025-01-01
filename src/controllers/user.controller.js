@@ -13,7 +13,7 @@ const genAccessAndRefreshToken = async (user) => {
     } catch (error) {
         throw new ApiError(500, "Error generating tokens");
     }
-};
+};  
 
 const registerUser = asyncHandler(async (req, res) => {
     // get user details
@@ -69,7 +69,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // check password
     const isPswrdValid = await user.isPasswordValid(password);
     if (!isPswrdValid) throw new ApiError(400, "Invalid cridentials");
-    
+
     // acess and refresh token
     const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
     user.refreshToken = refreshToken;
@@ -149,7 +149,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
                 200,
                 {
                     accessToken,
-                    refreshToken
+                    refreshToken,
                 },
                 "access token refreshed"
             )
