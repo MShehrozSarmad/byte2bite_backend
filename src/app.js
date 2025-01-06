@@ -18,8 +18,10 @@ app.use(cookieParser());
 
 // importing routes
 import userRouter from "./routes/user.route.js";
+import dashboardRouter from "./routes/dashboard.route.js";
 
 // using routes
 app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
 
 export { app };

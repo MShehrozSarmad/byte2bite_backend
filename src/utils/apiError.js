@@ -8,7 +8,7 @@ class ApiError extends Error {
         super(message);
         this.statusCode = statusCode;
         this.data = null;
-        this.message = message;
+        this.message = message || "Something went wrong at server!!";
         this.success = false;
         this.error = this.error;
 
@@ -17,6 +17,10 @@ class ApiError extends Error {
         }else{
             Error.captureStackTrace(this, this.constructor);
         }
+
+        console.log(this.stack)
+        this.stack = null;
+
     }
 }
 

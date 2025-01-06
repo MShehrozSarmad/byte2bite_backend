@@ -1,7 +1,9 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
+import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { completeProfileSchema } from "../validators/completeProfile.validator.js";
 
 const genAccessAndRefreshToken = async (user) => {
     try {
@@ -13,7 +15,7 @@ const genAccessAndRefreshToken = async (user) => {
     } catch (error) {
         throw new ApiError(500, "Error generating tokens");
     }
-};  
+};
 
 const registerUser = asyncHandler(async (req, res) => {
     // get user details
@@ -123,14 +125,35 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    // get refresh token from cookies
-    const user = req.user;
-    const incomingRefreshToken = req.incomingRefreshToken;
+    // getting token
+    const token =
+        req.body?.refreshToken ||
+        req.cookies?.refreshToken ||
+        req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) throw new ApiError(401, "unauthorized request");
 
-    if (incomingRefreshToken !== user.refreshToken)
-        throw new ApiError(401, "Invalid or expired refresh token");
+    // decoding ref token
+    let decodedToken;
+    try {
+        decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+        if (err.name == "TokenExpiredError") {
+            throw new ApiError(401, "Refresh Token expired, try relogin");
+        } else {
+            console.log(err);
+            throw new ApiError(401, "Something went wrong, please relogin");
+        }
+    }
 
-    // generate new access token
+    // getting user from token
+    const user = await User.findById(decodedToken?._id);
+    if (!user) throw new ApiError(400, "Invalid or tampered refresh roken");
+
+    //checking validity
+    if (token !== user.refreshToken)
+        throw new ApiError(400, "Invalid or tampered refresh token");
+
+    // generate new access token and set
     const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
 
     user.refreshToken = refreshToken;
@@ -156,4 +179,43 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         );
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const completeProfile = asyncHandler(async (req, res) => {
+    console.log(req.body);
+
+    const userId = req.user._id;
+
+    const { error, value } = completeProfileSchema.validate(req.body);
+    if (error) throw new ApiError(400, error.details[0].message);
+
+    const updateData = {
+        role: value.role,
+        details: {
+            basicInfo: value.basicInfo,
+            address: value.address,
+            additionalDetails: value.additionalDetails,
+            ngoSpecific: value.ngoSpecific,
+        },
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+        new: true,
+        runValidator: true,
+    }).select("-password -refreshToken");
+    console.log(updatedUser);
+
+    if (!updateData)
+        throw new ApiError(404, "user not found, something went wrong");
+
+    res.status(200).json(
+        new ApiResponse(200, updatedUser, "profile updated successfully")
+    );
+});
+
+
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    completeProfile,
+};
