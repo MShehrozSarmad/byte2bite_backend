@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { ApiError } from "./apiError";
 
 //cloudinary Configuration
 cloudinary.config({
@@ -13,14 +14,13 @@ const uploadOnCloudinary = async (localFilePath) => {
     try {
         if (!localFilePath) return null;
         const res = await cloudinary.uploader.upload(localFilePath, {
-            public_id: "shoes",
             resource_type: "auto",
         });
         console.log("file uploaded successfully", res.url);
         return res;
     } catch (error) {
         fs.unlinkSync(localFilePath);
-        return null;
+        throw new ApiError()
     }
 };
 

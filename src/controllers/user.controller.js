@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { completeProfileSchema } from "../validators/completeProfile.validator.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const genAccessAndRefreshToken = async (user) => {
     try {
@@ -31,12 +32,6 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log(userExisted);
     if (userExisted)
         throw new ApiError(409, "User with same email already exists");
-
-    // check for profile picture
-    // const pf = req.file?.profilePicture[0]?.path;
-    // console.log(pf);
-    // if(!pf) throw new ApiError( 404, "Profile picture is required");
-    // upload to cloudinary
 
     // create user in db
     const user = await User.create({ email, password });
@@ -157,7 +152,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken } = await genAccessAndRefreshToken(user);
 
     user.refreshToken = refreshToken;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     const options = {
         httpOnly: true,
@@ -211,6 +206,25 @@ const completeProfile = asyncHandler(async (req, res) => {
     );
 });
 
+const setDP = asyncHandler(async (req, res) => {
+    // check for profile picture
+    const profilePicture = req.file?.path;
+    if (!profilePicture) throw new ApiError(404, "Profile picture is required");
+
+    // upload to cloudinary
+    const uploadedPic = await uploadOnCloudinary(profilePicture);
+    if(!uploadedPic) throw new ApiError(500, "failed to upload image");
+
+    const user = req.user;
+    user.details.basicInfo.profilePicture = uploadedPic.url;
+    user.save({ validateBeforeSave: false });
+
+    console.log(user);
+
+    res.status(200).json(
+        new ApiResponse(200, uploadedPic.url, "profile picture uploaded")
+    );
+});
 
 export {
     registerUser,
@@ -218,4 +232,5 @@ export {
     logoutUser,
     refreshAccessToken,
     completeProfile,
+    setDP,
 };

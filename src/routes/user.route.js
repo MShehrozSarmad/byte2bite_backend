@@ -5,9 +5,10 @@ import {
     logoutUser,
     refreshAccessToken,
     registerUser,
+    setDP,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-
+import { upload } from "../middlewares/multer.middleware.js";
 const router = Router();
 
 router.use((req, res, next) => {
@@ -22,6 +23,7 @@ router.route("/refresh-tokens").post(refreshAccessToken);
 
 //secure routes
 router.route("/logout").post(verifyJWT, logoutUser);
-router.route('/complete-profile').post(verifyJWT, completeProfile)
+router.route("/complete-profile").post(verifyJWT, completeProfile);
+router.route("/upload/profilePicture").post(verifyJWT, upload.single("profilePicture"), setDP);
 
 export default router;

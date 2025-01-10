@@ -7,7 +7,7 @@ const completeProfileSchema = Joi.object({
         profilePicture: Joi.string().uri().optional(),
         contact: Joi.string().required(),
         alternateContact: Joi.string().optional(),
-        isVerified: Joi.boolean().optional(),
+        // isVerified: Joi.boolean().optional(),
     }).required(),
     address: Joi.object({
         country: Joi.string().required(),
