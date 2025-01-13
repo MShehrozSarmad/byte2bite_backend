@@ -5,7 +5,7 @@ import {
     logoutUser,
     refreshAccessToken,
     registerUser,
-    setDP,
+    setProfilePicture,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -24,6 +24,6 @@ router.route("/refresh-tokens").post(refreshAccessToken);
 //secure routes
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/complete-profile").post(verifyJWT, completeProfile);
-router.route("/upload/profilePicture").post(verifyJWT, upload.single("profilePicture"), setDP);
+router.route("/upload/profilePicture").post(verifyJWT, upload.single("profilePicture"), setProfilePicture);
 
 export default router;

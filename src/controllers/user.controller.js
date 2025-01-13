@@ -206,21 +206,19 @@ const completeProfile = asyncHandler(async (req, res) => {
     );
 });
 
-const setDP = asyncHandler(async (req, res) => {
+const setProfilePicture = asyncHandler(async (req, res) => {
     // check for profile picture
     const profilePicture = req.file?.path;
-    if (!profilePicture) throw new ApiError(404, "Profile picture is required");
+    if (!profilePicture) throw new ApiError(400, "Profile picture is required");
 
     // upload to cloudinary
     const uploadedPic = await uploadOnCloudinary(profilePicture);
-    if(!uploadedPic) throw new ApiError(500, "failed to upload image");
 
     const user = req.user;
     user.details.basicInfo.profilePicture = uploadedPic.url;
     user.save({ validateBeforeSave: false });
 
     console.log(user);
-
     res.status(200).json(
         new ApiResponse(200, uploadedPic.url, "profile picture uploaded")
     );
@@ -232,5 +230,5 @@ export {
     logoutUser,
     refreshAccessToken,
     completeProfile,
-    setDP,
+    setProfilePicture,
 };
