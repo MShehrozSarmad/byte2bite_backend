@@ -15,7 +15,7 @@ const sendSMS = async (phoneNumber, otp) => {
         return res;
     } catch (error) {
         console.error("Error sending OTP:", error);
-        throw new ApiError(503, "Failed to send OTP");
+        throw new ApiError(503, "Failed to send OTP via sms");
     }
 };
 
