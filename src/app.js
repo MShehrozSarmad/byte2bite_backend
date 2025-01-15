@@ -17,11 +17,15 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // importing routes
+import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
+import otpRouter from "./routes/otp.route.js";
 import dashboardRouter from "./routes/dashboard.route.js";
 
 // using routes
-app.use("/api/v1/auth", userRouter);
+app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/otp", otpRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 
 export { app };
