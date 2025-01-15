@@ -6,6 +6,7 @@ const userSchema = new Schema(
     {
         email: { type: String, required: true, unique: true, unique: true },
         password: { type: String, required: [true, "password is required"] },
+        isVerified: { type: Boolean, default: false },
         role: {
             type: String,
             enum: ["pending", "contributor", "ngo", "admin"],
@@ -15,14 +16,12 @@ const userSchema = new Schema(
             type: String,
             // required: true,
         },
-
         details: {
             basicInfo: {
                 name: { type: String },
                 profilePicture: { type: String },
                 contact: { type: String },
                 alternateContact: { type: String },
-                isVerified: { type: Boolean, default: false },
             },
             address: {
                 country: { type: String },

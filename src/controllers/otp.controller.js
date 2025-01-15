@@ -39,6 +39,8 @@ const getOTP = asyncHandler(async (req, res) => {
 const verifyOTP = asyncHandler(async (req, res) => {
     const { otp } = req.body;
     const { email } = req.user;
+    const user = req.user;
+    console.log(user);
 
     console.log(otp, email);
     if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
@@ -56,6 +58,10 @@ const verifyOTP = asyncHandler(async (req, res) => {
     // console.log(isValid);
 
     if (!isValid) throw new ApiError(400, "Invalid or expired OTP .");
+
+    user.isVerified = isValid;
+    user.save();
+    console.log(user.isVerified);
 
     res.status(200).json(
         new ApiResponse(200, isValid, "OTP verified successfully.")
