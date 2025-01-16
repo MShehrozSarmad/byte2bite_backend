@@ -25,7 +25,7 @@ import dashboardRouter from "./routes/dashboard.route.js";
 // using routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/otp", otpRouter);
+app.use("/api/v1/verify", otpRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 
 export { app };

@@ -9,7 +9,7 @@ router.use((req, res, next) => {
 });
 
 //secure routes
-router.route("/getOTP").post(verifyJWT, getOTP);
-router.route("/verifyOTP").post(verifyJWT, verifyOTP);
+router.route("/otp").get(verifyJWT, getOTP);
+router.route("/otp").post(verifyJWT, verifyOTP);
 
 export default router;

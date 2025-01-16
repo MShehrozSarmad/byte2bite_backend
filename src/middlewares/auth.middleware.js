@@ -37,7 +37,8 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
 const checkRole = asyncHandler(async (req, res, next) => {
     console.log("role checked");
     console.log(req.user.role);
-    if (req.user.role == "pending") return res.send("your role is pending");
+    if (req.user.role == "pending")
+        throw new ApiError(403, "your role is pending");
     next();
 });
 
@@ -45,7 +46,7 @@ const isVerified = asyncHandler(async (req, res, next) => {
     console.log("role checked");
     const flag = req.user.isVerified;
     console.log(flag);
-    if (!flag) res.send("your account is not verified");
+    if (!flag) throw new ApiError(403, "your account is not verified");
     next();
 });
 
