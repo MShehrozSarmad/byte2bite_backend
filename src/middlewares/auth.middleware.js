@@ -11,7 +11,7 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
         req.body?.accessToken ||
         req.cookies?.accessToken ||
         req.header("Authorization")?.replace("Bearer ", "");
-    console.log(token);
+    // console.log(token);
     if (!token) throw new ApiError(401, "unauthorized request");
 
     let decodedToken;
@@ -25,7 +25,7 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
             throw new ApiError(401, "Something went wrong, please relogin");
         }
     }
-    console.log(decodedToken);
+    // console.log(decodedToken);
 
     const user = await User.findById(decodedToken?._id);
     if (!user) throw new ApiError(400, "Invalid or tampered access token");
@@ -34,20 +34,12 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
     next();
 });
 
-const checkRole = asyncHandler(async (req, res, next) => {
-    console.log("role checked");
-    console.log(req.user.role);
-    if (req.user.role == "pending")
-        throw new ApiError(403, "your role is pending");
-    next();
-});
-
 const isVerified = asyncHandler(async (req, res, next) => {
-    console.log("role checked");
+    console.log("user authorization");
     const flag = req.user.isVerified;
-    console.log(flag);
+    // console.log(flag);
     if (!flag) throw new ApiError(403, "your account is not verified");
     next();
 });
 
-export { verifyJWT, checkRole, isVerified };
+export { verifyJWT, isVerified };

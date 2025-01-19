@@ -20,12 +20,12 @@ app.use(cookieParser());
 import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import otpRouter from "./routes/otp.route.js";
-import dashboardRouter from "./routes/dashboard.route.js";
+import cntrbtrRouter from "./routes/contributor.route.js";
 
 // using routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/verify", otpRouter);
-app.use("/api/v1/dashboard", dashboardRouter);
+app.use("/api/v1/contributor/dashboard", cntrbtrRouter);
 
 export { app };

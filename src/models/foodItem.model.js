@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+
 const foodItemSchema = new Schema({
     contributor: {
         type: Schema.Types.ObjectId,
@@ -8,8 +9,7 @@ const foodItemSchema = new Schema({
     name: { type: String, required: true },
     description: { type: String },
     quantity: { type: Number, required: true },
-    expirationDate: { type: Date },
-    isExpired: { type: Boolean, default: false },
+    expirationDate: { type: Date, required: true },
     status: {
         type: String,
         enum: ["available", "donated", "expired"],
