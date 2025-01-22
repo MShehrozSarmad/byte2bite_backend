@@ -20,7 +20,7 @@ const getOTP = asyncHandler(async (req, res) => {
         if (method === "sms") {
             await sendSMS(phone, otp);
         } else if (method === "email") {
-            const resp = await sendEmail(email, otp);
+            const resp = await sendEmail(email, "OTP verification", `Your OTP for Byte2Bite is: ${otp}`);
             // console.log(resp);
         } else {
             throw new ApiError(400, `invalid method ${method}`);

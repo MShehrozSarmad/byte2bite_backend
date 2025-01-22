@@ -11,13 +11,13 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const sendEmail = async (email, otp) => {
+const sendEmail = async (email, subject, message) => {
     try {
         const res = await transporter.sendMail({
             from: "Byte2Bite",
             to: email,
-            subject: "OTP Verification",
-            text: `Your OTP for Byte2Bite is: ${otp}`,
+            subject,
+            text: message,
         });
         console.log("email sent");
         return res;

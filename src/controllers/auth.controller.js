@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendEmail } from "../utils/nodemailer.js";
 
 const genAccessAndRefreshToken = async (user) => {
     try {
@@ -172,4 +173,65 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         );
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const reqResetPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    if (!email) throw new ApiError(400, "email or phone is required");
+
+    const user = await User.findOne({ email });
+    console.log(user);
+
+    if (!user) throw new ApiError(400, "user not found");
+
+    const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "600s",
+    });
+
+    sendEmail(
+        email,
+        "Password Reset Request",
+        `Click on link to reset your password: ${process.env.BASE_URL}/api/v1/auth/reset-password/${token}`
+    );
+
+    res.status(200).json(
+        new ApiResponse(200, null, "email send for password reset")
+    );
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+    console.log("reset password ------------------------------");
+
+    const { token } = req.params;
+    console.log(token);
+
+    const { password } = req.body;
+    console.log(password);
+
+    if (!token) throw new ApiError(400, "token is required");
+
+    if (!password) throw new ApiError(400, "new password is required");
+
+    const { email } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    console.log(email);
+
+    if (!email) throw new ApiError(400, "Invalid or expired token");
+
+    const user = await User.findOne({ email });
+    if (!user) throw new ApiError(404, "user not found");
+
+    user.password = password;
+    user.save();
+
+    sendEmail(email, "Password Changed", "Your password changed successfully");
+
+    res.status(200).json(new ApiResponse(200, "Password updated successfully"));
+});
+
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    reqResetPassword,
+    resetPassword,
+};
