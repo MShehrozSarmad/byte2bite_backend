@@ -2,11 +2,12 @@ import { Router } from "express";
 import {
     completeProfile,
     deleteAccount,
+    getNotifications,
     getProfile,
     setProfilePicture,
     uploadCertificate,
 } from "../controllers/user.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { isVerified, verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { isNGO } from "../middlewares/role.middleware.js";
 
@@ -21,6 +22,7 @@ router.use((req, _, next) => {
 router.route("/profile").put(verifyJWT, completeProfile);
 router.route("/profile").get(verifyJWT, getProfile);
 router.route("/del-account").delete(verifyJWT, deleteAccount);
+router.route("/notifications").get(verifyJWT, isVerified, getNotifications);
 
 // file upload routes
 router

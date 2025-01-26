@@ -2,9 +2,11 @@ import { Schema, model } from "mongoose";
 
 const contributionSchema = new Schema(
     {
-        foodItems: [
-            { type: Schema.Types.ObjectId, ref: "FoodItem", required: true },
-        ],
+        foodItem: {
+            type: Schema.Types.ObjectId,
+            ref: "FoodItem",
+            required: true,
+        },
         contributor: {
             type: Schema.Types.ObjectId,
             ref: "User",
@@ -41,27 +43,48 @@ const contributionSchema = new Schema(
     { timestamps: true }
 );
 
-// // Middleware to update history on status change
 contributionSchema.pre("save", function (next) {
+    const allowedTransitions = {
+        pending: ["accepted", "rejected"],
+        accepted: ["collecting", "rejected"],
+        collecting: ["collected", "cancelled"],
+        collected: ["distributing", "cancelled"],
+        distributing: ["donated", "cancelled"],
+    };
+
     if (this.isModified("status")) {
-        this.history.push({ status: this.status });
+        const prevStatus = this.history.slice(-1)[0]?.status || "pending";
+
+        if (!allowedTransitions[prevStatus]?.includes(this.status)) {
+            return next(
+                new Error(
+                    `Invalid status transition: ${prevStatus} → ${this.status}`
+                )
+            );
+        }
     }
+
+    this.history.push({ status: this.status, timestamp: new Date() });
     next();
 });
 
+contributionSchema.post("save", async function (doc) {
+    const statusMap = {
+        pending: "reserved",
+        accepted: "reserved",
+        collecting: "in_transit",
+        collected: "in_transit",
+        distributing: "in_transit",
+        donated: "donated",
+        rejected: "available",
+        cancelled: "cancelled",
+    };
+
+    if (statusMap[doc.status]) {
+        await FoodItem.findByIdAndUpdate(doc.foodItem, {
+            status: statusMap[doc.status],
+        });
+    }
+});
+
 export const Contribution = model("Contribution", contributionSchema);
-
-// Example usage:
-// const contribution = await Contribution.findById(donationId);
-
-// // Change status from 'pending' to 'accepted'
-// contribution.status = 'accepted';
-
-// // Add a record in the history array
-// contribution.history.push({
-//   status: 'accepted',
-//   timestamp: new Date(),
-// });
-
-// // Save the updated donation
-// await contribution.save();

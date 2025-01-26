@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { completeProfileSchema } from "../validators/completeProfile.validator.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Notification } from "../models/notification.model.js";
 
 const completeProfile = asyncHandler(async (req, res) => {
     console.log(req.body);
@@ -118,10 +119,25 @@ const uploadCertificate = asyncHandler(async (req, res) => {
     );
 });
 
+const getNotifications = asyncHandler(async (req, res) => {
+    const user = req.user._id;
+
+    const notifications = await Notification.find({ recipient: user });
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            notifications,
+            "notifications fetched successfully"
+        )
+    );
+});
+
 export {
     completeProfile,
     getProfile,
     deleteAccount,
     setProfilePicture,
     uploadCertificate,
+    getNotifications
 };
