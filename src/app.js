@@ -27,6 +27,6 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/verify", otpRouter);
 app.use("/api/v1/contributor/dashboard", cntrbtrRouter);
-app.use("/api/v1/ngo", )
+// app.use("/api/v1/ngo", )
 
 export { app };

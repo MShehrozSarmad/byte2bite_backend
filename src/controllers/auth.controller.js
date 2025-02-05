@@ -3,7 +3,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { sendEmail } from "../utils/nodemailer.js";
+import { sendEmail } from "../services/nodemailer.js";
 
 const genAccessAndRefreshToken = async (user) => {
     try {
@@ -124,7 +124,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         req.body?.refreshToken ||
         req.cookies?.refreshToken ||
         req.header("Authorization")?.replace("Bearer ", "");
-    if (!token) throw new ApiError(401, "unauthorized request");
+    if (!token) throw new ApiError(401, "unauthorized request, token not found");
 
     // decoding ref token
     let decodedToken;

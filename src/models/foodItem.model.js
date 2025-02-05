@@ -32,11 +32,11 @@ const foodItemSchema = new Schema(
 );
 
 // models/foodItem.model.js
-foodItemSchema.pre('save', function(next) {
-    if (this.expirationDate < new Date() && this.status !== 'donated') {
-      this.status = 'expired';
+foodItemSchema.pre("save", function (next) {
+    if (this.expirationDate < new Date() && this.status !== "donated") {
+        this.status = "expired";
     }
     next();
-  });
+});
 
 export const FoodItem = model("FoodItem", foodItemSchema);

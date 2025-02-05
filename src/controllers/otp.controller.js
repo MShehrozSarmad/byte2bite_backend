@@ -1,10 +1,10 @@
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { sendEmail } from "../utils/nodemailer.js";
-import { generateOTP, verifyGenOTP } from "../utils/otplib.js";
+import { sendEmail } from "../services/nodemailer.js";
+import { generateOTP, verifyGenOTP } from "../services/otplib.js";
 import { getStoredOtp, storeOtp } from "../utils/redis.js";
-import { sendSMS } from "../utils/twilio.js";
+import { sendSMS } from "../services/twilio.js";
 
 const getOTP = asyncHandler(async (req, res) => {
     const { method } = req.body;
