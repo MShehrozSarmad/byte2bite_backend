@@ -1,4 +1,6 @@
 import { Schema, model } from "mongoose";
+import { ApiError } from "../utils/apiError.js";
+import { FoodItem } from "./foodItem.model.js";
 
 const contributionSchema = new Schema(
     {
@@ -18,10 +20,12 @@ const contributionSchema = new Schema(
             enum: [
                 "pending",
                 "accepted",
+                "rejected",
                 "collecting",
                 "collected",
                 "distributing",
                 "donated",
+                "cancelled",
             ],
             default: "pending",
         },
@@ -44,25 +48,6 @@ const contributionSchema = new Schema(
 );
 
 contributionSchema.pre("save", function (next) {
-    const allowedTransitions = {
-        pending: ["accepted", "rejected"],
-        accepted: ["collecting", "rejected"],
-        collecting: ["collected", "cancelled"],
-        collected: ["distributing", "cancelled"],
-        distributing: ["donated", "cancelled"],
-    };
-
-    if (this.isModified("status")) {
-        const prevStatus = this.history.slice(-1)[0]?.status || "pending";
-
-        if (!allowedTransitions[prevStatus]?.includes(this.status)) {
-            return next(
-                new Error(
-                    `Invalid status transition: ${prevStatus} → ${this.status}`
-                )
-            );
-        }
-    }
 
     this.history.push({ status: this.status, timestamp: new Date() });
     next();
@@ -70,14 +55,13 @@ contributionSchema.pre("save", function (next) {
 
 contributionSchema.post("save", async function (doc) {
     const statusMap = {
-        pending: "reserved",
+        // pending: "reserved",
         accepted: "reserved",
         collecting: "in_transit",
         collected: "in_transit",
         distributing: "in_transit",
         donated: "donated",
-        rejected: "available",
-        cancelled: "cancelled",
+        cancelled: "available",
     };
 
     if (statusMap[doc.status]) {

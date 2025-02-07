@@ -5,6 +5,7 @@ import { FoodItem } from "../models/foodItem.model.js";
 import { foodItemSchema } from "../validators/fooditem.validator.js";
 import { Contribution } from "../models/contribution.model.js";
 import { Notification } from "../models/notification.model.js";
+import { ContributionService } from "../services/contribution.service.js";
 
 const overview = asyncHandler(async (req, res) => {
     console.log("on the overview dashboard");
@@ -72,52 +73,20 @@ const getFoodItems = asyncHandler(async (_, res) => {
     );
 });
 
-const cont_stts_response = asyncHandler(async (req, res) => {
+const updateStatusCont = asyncHandler(async (req, res) => {
     const { contribution, status } = req.body;
+    const user = req.user;
 
-    if (!["accepted", "rejected"].includes(status)) {
+    const allowedStatus = ["accepted", "rejected", "cancelled"];
+
+    if (!status || !contribution)
+        throw new ApiError(400, "contribution and status is required");
+
+    if (!allowedStatus.includes(status)) {
         throw new ApiError(400, "Invalid status");
     }
 
-    const updatedReq = await Contribution.findByIdAndUpdate(
-        contribution,
-        {
-            status,
-        },
-        { new: true }
-    );
-
-    if (!updatedReq) throw new ApiError(404, "Request not found");
-
-    await Notification.create({
-        recipient: updatedCont.ngo,
-        type: "status update",
-        contribution,
-        message: `Your request has been ${status}`,
-    });
-
-    res.status(200).json(200, null, "status updated successfully");
-});
-
-const cont_stts_collected = asyncHandler(async (req, res) => {
-    const { requestId } = req.body;
-
-    if (!requestId)
-        throw new ApiError(400, "Missing required fields: requestId");
-
-    const updatedReq = await Contribution.findByIdAndUpdate(
-        requestId,
-        { status: "collected" },
-        { new: true }
-    );
-    if (!updatedReq) throw new ApiError(404, "Request not found");
-
-    await Notification.create({
-        recipient: updatedReq.ngo,
-        type: "status update",
-        contribution: updatedReq._id,
-        message: "Food collected.",
-    });
+    await ContributionService.updateStatus(contribution, status, user);
 
     res.status(200).json(
         new ApiResponse(200, null, "status updated successfully")
@@ -129,6 +98,5 @@ export {
     addFood,
     getFoodItem,
     getFoodItems,
-    cont_stts_response,
-    cont_stts_collected,
+    updateStatusCont
 };

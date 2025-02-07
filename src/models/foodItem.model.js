@@ -19,7 +19,7 @@ const foodItemSchema = new Schema(
                 "in_transit", // Being collected/delivered
                 "donated", // Successfully donated
                 "expired", // Passed expiration
-                "cancelled", // Manually cancelled
+                // "cancelled", // Manually cancelled
             ],
             default: "available",
         },

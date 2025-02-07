@@ -21,12 +21,13 @@ import authRouter from "./routes/auth.route.js";
 import userRouter from "./routes/user.route.js";
 import otpRouter from "./routes/otp.route.js";
 import cntrbtrRouter from "./routes/contributor.route.js";
+import ngoRoutes from "./routes/ngo.route.js";
 
 // using routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/verify", otpRouter);
 app.use("/api/v1/contributor/dashboard", cntrbtrRouter);
-// app.use("/api/v1/ngo", )
+app.use("/api/v1/ngo", ngoRoutes);
 
 export { app };

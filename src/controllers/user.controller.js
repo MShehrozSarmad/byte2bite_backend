@@ -3,7 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { completeProfileSchema } from "../validators/completeProfile.validator.js";
-import { uploadOnCloudinary } from "../services/cloudinary.js";
+import { uploadOnCloudinary } from "../services/cloudinary.service.js";
 import { Notification } from "../models/notification.model.js";
 
 const completeProfile = asyncHandler(async (req, res) => {
