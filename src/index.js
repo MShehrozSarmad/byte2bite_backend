@@ -3,6 +3,10 @@ import connectDB from "./db/index.js";
 import { app } from "./app.js";
 // import dotenv from "dotenv";
 
+app.get("/", (req, res) => {
+  res.send("welcome to byte2bite api server");
+})
+
 // establisshind db connection and then starting app
 connectDB().then(() => {
   app.listen(process.env.PORT || 8000, () =>
