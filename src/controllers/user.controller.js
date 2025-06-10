@@ -14,19 +14,19 @@ const completeProfile = asyncHandler(async (req, res) => {
     const { error, value } = completeProfileSchema.validate(req.body);
     if (error) throw new ApiError(400, error.details[0].message);
 
-    // const updateData = {
-    //     role: value.role,
-    //     details: {
-    //         basicInfo: value.basicInfo,
-    //         address: value.address,
-    //         additionalDetails: value.additionalDetails,
-    //         ngoSpecific: value.ngoSpecific,
-    //     },
-    // };
+    const updateData = {
+        role: value.role,
+        details: {
+            basicInfo: value.basicInfo,
+            address: value.address,
+            additionalDetails: value.additionalDetails,
+            ngoSpecific: value.ngoSpecific,
+        },
+    };
 
     console.log("value: client: ----------------", value);
 
-    const updatedUser = await User.findByIdAndUpdate(userId, value, {
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
         new: true,
         runValidator: true,
     }).select("-password -refreshToken");
