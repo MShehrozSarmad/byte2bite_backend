@@ -1,9 +1,10 @@
 import "dotenv/config";
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
+import {HOME} from "./constants.js"
 
-app.get("/", (req, res) => {
-  res.send("welcome to byte2bite api server");
+app.get("/", (_, res) => {
+  res.send(HOME);
 })
 
 // establisshind db connection and then starting app
