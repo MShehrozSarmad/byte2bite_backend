@@ -5,6 +5,7 @@ import morgan from "morgan";
 import fs from "fs";
 import path from "path";
 import { HOME } from "./constants.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -44,5 +45,8 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/verify", otpRouter);
 app.use("/api/v1/contributor/dashboard", cntrbtrRouter);
 app.use("/api/v1/ngo", ngoRoutes);
+
+// Error handling middleware (should be last)
+app.use(errorHandler);
 
 export { app };
