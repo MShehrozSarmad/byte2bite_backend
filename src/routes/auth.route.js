@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { authLimit, resetPswrdLimit } from "../utils/rateLimiting.js";
 import {
     registerUser,
     loginUser,
@@ -7,7 +9,7 @@ import {
     resetPassword,
     reqResetPassword,
 } from "../controllers/auth.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+
 const router = Router();
 
 router.use((req, res, next) => {
@@ -15,13 +17,11 @@ router.use((req, res, next) => {
     next();
 });
 
-router.route("/register").post(registerUser);
-router.route("/login").post(loginUser);
-router.route("/refresh-tokens").post(refreshAccessToken);
-router.route("/req-reset-password").post(reqResetPassword);
-router.route("/reset-password/:token").post(resetPassword);
-
-//secure routes
-router.route("/logout").post(verifyJWT, logoutUser);
+router.post("/register", authLimit, registerUser);
+router.post("/login", loginUser);
+router.post("/refresh-tokens", refreshAccessToken);
+router.post("/req-reset-password", resetPswrdLimit, reqResetPassword);
+router.post("/reset-password/:token", resetPassword);
+router.post("/logout", verifyJWT, logoutUser);
 
 export default router;

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- <title>Welcome to Byte2Bite!</title> -->
+  <style>
+    body {
+      background: #f6f8fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 420px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      padding: 32px 28px 24px 28px;
+      text-align: center;
+    }
+    .logo {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #2b7cff;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    h2 {
+      color: #22223b;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #4a4e69;
+      font-size: 1rem;
+      margin: 12px 0;
+    }
+    .welcome-box {
+      background: #e0ffe0;
+      color: #1b5e20;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 18px 0 20px 0;
+      box-shadow: 0 2px 8px rgba(27,94,32,0.08);
+      display: inline-block;
+    }
+    .profile-button {
+      display: inline-block;
+      background: #2b7cff;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 12px 32px;
+      border-radius: 8px;
+      margin: 18px 0 20px 0;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(43,124,255,0.08);
+      transition: background 0.2s;
+    }
+    .footer {
+      margin-top: 28px;
+      color: #8d99ae;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Byte2Bite</div>
+    <h2>Welcome, {{name}}!</h2>
+    <div class="welcome-box">Thank you for joining Byte2Bite. We're excited to have you on board!</div>
+    <p>To get started, please complete your profile so you can enjoy all the features of Byte2Bite.</p>
+    <a href="{{profileLink}}" class="profile-button">Complete Your Profile</a>
+    <p>If you have any questions, feel free to contact our support team.</p>
+    <div class="footer">
+      Best regards,<br>Byte2Bite Team
+    </div>
+  </div>
+</body>
+</html>

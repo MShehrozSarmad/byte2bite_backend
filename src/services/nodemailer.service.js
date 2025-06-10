@@ -2,7 +2,7 @@ import nodemailer from "nodemailer";
 import { ApiError } from "../utils/apiError.js";
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com", 
+    host: "smtp.gmail.com",
     port: 587,
     secure: false,
     auth: {
@@ -17,7 +17,7 @@ const sendEmail = async (email, subject, message) => {
             from: "Byte2Bite",
             to: email,
             subject,
-            text: message,
+            html: message,
         });
         console.log("email sent");
         return res;

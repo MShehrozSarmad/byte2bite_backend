@@ -1,8 +1,19 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import fs from "fs";
+import path from "path";
+import { HOME } from "./constants.js";
 
 const app = express();
+
+//logging
+const accessLogStream = fs.createWriteStream(
+    path.join(process.cwd(), "access.log"),
+    { flags: "a" }
+);
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // cors configuration
 app.use(
@@ -22,6 +33,10 @@ import userRouter from "./routes/user.route.js";
 import otpRouter from "./routes/otp.route.js";
 import cntrbtrRouter from "./routes/contributor.route.js";
 import ngoRoutes from "./routes/ngo.route.js";
+
+app.get("/", (req, res) => {
+    res.status(200).send(HOME);
+});
 
 // using routes
 app.use("/api/v1/auth", authRouter);

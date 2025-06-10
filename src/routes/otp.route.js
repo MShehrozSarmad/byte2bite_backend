@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { getOTP, verifyOTP } from "../controllers/otp.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import {otpLimit} from "../utils/rateLimiting.js"
+
 const router = Router();
 
 router.use((req, res, next) => {
@@ -9,7 +11,7 @@ router.use((req, res, next) => {
 });
 
 //secure routes
-router.route("/otp").get(verifyJWT, getOTP);
-router.route("/otp").post(verifyJWT, verifyOTP);
+router.get("/otp", otpLimit ,verifyJWT, getOTP);
+router.post("/otp", verifyJWT, verifyOTP);
 
 export default router;

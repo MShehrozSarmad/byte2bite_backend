@@ -3,7 +3,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendEmail } from "../services/nodemailer.service.js";
 import { generateOTP, verifyGenOTP } from "../services/otplib.service.js";
-import { getStoredOtp, storeOtp } from "../utils/redis.js";
+// import { getStoredOtp, storeOtp } from "../utils/redis.js";
 import { sendSMS } from "../services/twilio.service.js";
 
 const getOTP = asyncHandler(async (req, res) => {
@@ -25,7 +25,7 @@ const getOTP = asyncHandler(async (req, res) => {
         } else {
             throw new ApiError(400, `invalid method ${method}`);
         }
-        await storeOtp(email, otp);
+        // await storeOtp(email, otp);
     } catch (err) {
         throw new ApiError(
             503,
@@ -47,7 +47,7 @@ const verifyOTP = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid OTP format.");
     }
 
-    const storedOTP = await getStoredOtp(email);
+    // const storedOTP = await getStoredOtp(email);
     // console.log(storedOTP);
 
     if (!storedOTP || storedOTP !== otp) {

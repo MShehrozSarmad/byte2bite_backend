@@ -4,6 +4,8 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendEmail } from "../services/nodemailer.service.js";
+import fs from "fs";
+import path from "path";
 
 const genAccessAndRefreshToken = async (user) => {
     try {
@@ -43,6 +45,21 @@ const registerUser = asyncHandler(async (req, res) => {
     );
     if (!userCreated) throw new ApiError(500, "Error creating user");
 
+    // Send welcome email
+    const templatePath = path.join(
+        process.cwd(),
+        "src",
+        "templates",
+        "welcome.html"
+    );
+    let html = fs.readFileSync(templatePath, "utf-8");
+    html = html.replace(/{{name}}/g, email.split("@")[0]);
+    html = html.replace(
+        /{{profileLink}}/g,
+        `${process.env.BASE_URL}/user/profile`
+    );
+    await sendEmail(email, "Welcome to Byte2Bite!", html);
+
     return res
         .status(200)
         .json(
@@ -72,7 +89,7 @@ const loginUser = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     const loggedInUser = await User.findById(user.id).select(
-        "-password -details"
+        "-password -refreshToken"
     );
 
     // send cookies
@@ -87,7 +104,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { loggedInUser, accessToken, refreshToken },
+                { user: loggedInUser, accessToken, refreshToken },
                 "User logged in successfully"
             )
         );
@@ -124,7 +141,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         req.body?.refreshToken ||
         req.cookies?.refreshToken ||
         req.header("Authorization")?.replace("Bearer ", "");
-    if (!token) throw new ApiError(401, "unauthorized request, token not found");
+    if (!token)
+        throw new ApiError(401, "unauthorized request, token not found");
 
     // decoding ref token
     let decodedToken;
@@ -186,14 +204,31 @@ const reqResetPassword = asyncHandler(async (req, res) => {
         expiresIn: "600s",
     });
 
-    sendEmail(
-        email,
-        "Password Reset Request",
-        `Click on link to reset your password: ${process.env.BASE_URL}/api/v1/auth/reset-password/${token}`
+    const templatePath = path.join(
+        process.cwd(),
+        "src",
+        "templates",
+        "reset_password.html"
     );
+    let html = fs.readFileSync(templatePath, "utf-8");
+    html = html.replace(
+        /{{name}}/g,
+        user.details.basicInfo.name || email.split("@")[0]
+    );
+    html = html.replace(
+        /{{resetLink}}/g,
+        `${process.env.RESET_PASSWORD}/${token}`
+    );
+    await sendEmail(email, "Password Reset Request", html);
+
+    // sendEmail(
+    //     email,
+    //     "Password Reset Request",
+    //     `Click on link to reset your password: ${process.env.BASE_URL}/api/v1/auth/reset-password/${token}`
+    // );
 
     res.status(200).json(
-        new ApiResponse(200, null, "email send for password reset")
+        new ApiResponse(200, null, "email sent for password reset")
     );
 });
 
@@ -222,7 +257,20 @@ const resetPassword = asyncHandler(async (req, res) => {
     user.password = password;
     user.save();
 
-    sendEmail(email, "Password Changed", "Your password changed successfully");
+    // sendEmail(email, "Password Changed", "Your password changed successfully");
+
+    const templatePath = path.join(
+        process.cwd(),
+        "src",
+        "templates",
+        "password_changed.html"
+    );
+    let html = fs.readFileSync(templatePath, "utf-8");
+    html = html.replace(
+        /{{name}}/g,
+        user.details.basicInfo.name || email.split("@")[0]
+    );
+    await sendEmail(email, "Password Reset Request", html);
 
     res.status(200).json(new ApiResponse(200, "Password updated successfully"));
 });

@@ -7,7 +7,7 @@ import { uploadOnCloudinary } from "../services/cloudinary.service.js";
 import { Notification } from "../models/notification.model.js";
 
 const completeProfile = asyncHandler(async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
 
     const userId = req.user._id;
 
@@ -24,13 +24,15 @@ const completeProfile = asyncHandler(async (req, res) => {
     //     },
     // };
 
+    console.log("value: client: ----------------", value);
+
     const updatedUser = await User.findByIdAndUpdate(userId, value, {
         new: true,
         runValidator: true,
     }).select("-password -refreshToken");
-    console.log(updatedUser);
+    console.log("updated user: db: ----------------", updatedUser);
 
-    if (!updateData)
+    if (!updatedUser)
         throw new ApiError(404, "user not found, something went wrong");
 
     res.status(200).json(
@@ -139,5 +141,5 @@ export {
     deleteAccount,
     setProfilePicture,
     uploadCertificate,
-    getNotifications
+    getNotifications,
 };
