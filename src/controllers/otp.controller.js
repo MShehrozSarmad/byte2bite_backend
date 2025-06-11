@@ -11,13 +11,15 @@ import path from "path";
 const getOTP = asyncHandler(async (req, res) => {
     const { method } = req.body;
     // console.log(method, req.body);
-    const { email } = req.user;
+    const { email, isVerified } = req.user;
     // console.log(email);
     const phone = req.user.details.basicInfo.contact;
     // console.log(phone);
 
-    const otp = generateOTP();
+    console.log("status::", isVerified);
+    if (isVerified) throw new ApiError(400, "Acoount is already verified.");
 
+    const otp = generateOTP();
     try {
         if (method === "sms") {
             await sendSMS(phone, otp);
@@ -89,7 +91,7 @@ const verifyOTP = asyncHandler(async (req, res) => {
         /{{name}}/g,
         user.details.basicInfo.name || email.split("@")[0]
     );
-    await sendEmail(email, "Account Verification OTP", html);
+    await sendEmail(email, "Account Verified", html);
 
     res.status(200).json(
         new ApiResponse(200, isValid, "OTP verified successfully.")
