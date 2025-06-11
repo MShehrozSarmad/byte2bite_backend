@@ -34,8 +34,8 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
     next();
 });
 
-const isVerified = asyncHandler(async (req, res, next) => {
-    console.log("user authorization");
+const isVerified = asyncHandler(async (req, _, next) => {
+    // console.log("user authorization");
     const flag = req.user.isVerified;
     // console.log(flag);
     if (!flag) throw new ApiError(403, "your account is not verified");

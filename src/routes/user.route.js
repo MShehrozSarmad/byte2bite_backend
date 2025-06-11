@@ -22,7 +22,7 @@ router.use((req, _, next) => {
 router.route("/profile").put(verifyJWT, completeProfile);
 router.route("/profile").get(verifyJWT, getProfile);
 router.route("/del-account").delete(verifyJWT, deleteAccount);
-router.route("/notifications").get(verifyJWT, isVerified, getNotifications);
+router.route("/notifications").get(verifyJWT, getNotifications);
 
 // file upload routes
 router

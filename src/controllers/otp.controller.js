@@ -40,9 +40,9 @@ const verifyOTP = asyncHandler(async (req, res) => {
     const { otp } = req.body;
     const { email } = req.user;
     const user = req.user;
-    console.log(user);
+    // console.log(user);
 
-    console.log(otp, email);
+    // console.log(otp, email);
     if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
         throw new ApiError(400, "Invalid OTP format.");
     }
@@ -61,7 +61,7 @@ const verifyOTP = asyncHandler(async (req, res) => {
 
     user.isVerified = isValid;
     user.save();
-    console.log(user.isVerified);
+    // console.log(user.isVerified);
 
     res.status(200).json(
         new ApiResponse(200, isValid, "OTP verified successfully.")

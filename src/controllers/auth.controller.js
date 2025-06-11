@@ -11,8 +11,8 @@ const genAccessAndRefreshToken = async (user) => {
     try {
         const accessToken = await user.genAccessToken();
         const refreshToken = await user.genRefreshToken();
-        console.log("Access token inner: ", accessToken);
-        console.log("Refresh token inner: ", refreshToken);
+        // console.log("Access token inner: ", accessToken);
+        // console.log("Refresh token inner: ", refreshToken);
         return { accessToken, refreshToken };
     } catch (error) {
         throw new ApiError(500, "Error generating tokens");
@@ -22,21 +22,21 @@ const genAccessAndRefreshToken = async (user) => {
 const registerUser = asyncHandler(async (req, res) => {
     // get user details
     const { email, password } = req.body;
-    console.log(req.body);
-    console.log(email, password);
+    // console.log(req.body);
+    // console.log(email, password);
     // validate user details
     if (!email || !password)
         throw new ApiError(400, "Email and Password required");
 
     // user already exists :email based
     const userExisted = await User.findOne({ email });
-    console.log(userExisted);
+    // console.log(userExisted);
     if (userExisted)
         throw new ApiError(409, "User with same email already exists");
 
     // create user in db
     const user = await User.create({ email, password });
-    console.log(user);
+    // console.log(user);
 
     // check for user creation
     // remove password and refresh token from reponse
@@ -196,7 +196,7 @@ const reqResetPassword = asyncHandler(async (req, res) => {
     if (!email) throw new ApiError(400, "email or phone is required");
 
     const user = await User.findOne({ email });
-    console.log(user);
+    // console.log(user);
 
     if (!user) throw new ApiError(400, "user not found");
 
@@ -233,13 +233,13 @@ const reqResetPassword = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
-    console.log("reset password ------------------------------");
+    // console.log("reset password ------------------------------");
 
     const { token } = req.params;
-    console.log(token);
+    // console.log(token);
 
     const { password } = req.body;
-    console.log(password);
+    // console.log(password);
 
     if (!token) throw new ApiError(400, "token is required");
 
@@ -247,7 +247,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
     const { email } = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-    console.log(email);
+    // console.log(email);
 
     if (!email) throw new ApiError(400, "Invalid or expired token");
 

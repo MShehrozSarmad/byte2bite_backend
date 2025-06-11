@@ -12,7 +12,7 @@ import { isContributor, isNGO } from "../middlewares/role.middleware.js";
 const router = Router();
 
 // role based secure routes
-router.route("/overview").get(verifyJWT, isVerified, isContributor, overview);
+router.route("/overview").get(verifyJWT, isContributor, overview);
 router.route("/addfood").post(verifyJWT, isVerified, isContributor, addFood);
 router.route("/getfooditem").post(verifyJWT, isVerified, getFoodItem);
 router.route("/getfooditems").post(verifyJWT, isVerified, getFoodItems);
