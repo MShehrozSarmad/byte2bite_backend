@@ -15,7 +15,7 @@ const accessLogStream = fs.createWriteStream(
     { flags: "a" }
 );
 app.use(morgan("combined", { stream: accessLogStream }));
-
+app.use(morgan("dev"));
 // cors configuration
 app.use(
     cors({
