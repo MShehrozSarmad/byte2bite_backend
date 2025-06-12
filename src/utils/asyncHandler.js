@@ -19,7 +19,7 @@ const asyncHandler = (requestHandler) => {
             if (err instanceof ApiError) {
                 return next(err);
             }
-            next(new ApiError(500, "Something went wrong at server!"));
+            next(new ApiError(500,  err.message || "Something went wrong at server!"));
         });
     };
 };

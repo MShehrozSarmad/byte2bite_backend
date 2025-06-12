@@ -28,7 +28,7 @@ const completeProfile = asyncHandler(async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
         new: true,
-        runValidator: true,
+        runValidators: true,
     }).select("-password -refreshToken");
     // console.log("updated user: db: ----------------", updatedUser);
 
