@@ -35,17 +35,17 @@ const addFood = asyncHandler(async (req, res) => {
 });
 
 const getFoodItem = asyncHandler(async (req, res) => {
-    const { foodItem } = req.body;
-    console.log(foodItem);
+    const { foodId } = req.body;
+    console.log(foodId);
 
-    if (!foodItem) throw new ApiError(400, "food id is required");
+    if (!foodId) throw new ApiError(400, "food id is required");
 
-    const food = await FoodItem.findById(foodItem).populate(
-        "contributor",
-        "-refreshToken -password"
-    );
+    const food = await FoodItem.findOne({
+        _id: foodId,
+        contributor: req.user._id,
+    }).populate("contributor", "-refreshToken -password");
 
-    if (!food) throw new ApiError(400, "no food is listed with this id");
+    if (!food) throw new ApiError(400, "food item not found");
 
     res.status(200).json(
         new ApiResponse(200, food, "food item data fetched successfully")
@@ -60,11 +60,18 @@ const getFoodItem = asyncHandler(async (req, res) => {
 
 // });
 
-const getFoodItems = asyncHandler(async (_, res) => {
-    const food = await FoodItem.find().populate(
-        "contributor",
-        "-refreshToken -password"
-    );
+const getFoodItems = asyncHandler(async (req, res) => {
+    // const food = await FoodItem.find().populate(
+    //     "contributor",
+    //     "-refreshToken -password"
+    // );
+
+    const user = req.user;
+    const food = await FoodItem.find({ contributor: user._id });
+    // const food = await FoodItem.find({ contributor: user._id }).populate(
+    //     "contributor",
+    //     "-refreshToken -password"
+    // );
 
     if (food.length == 0) throw new ApiError(400, "no food is listed");
 
@@ -93,10 +100,4 @@ const updateStatusCont = asyncHandler(async (req, res) => {
     );
 });
 
-export {
-    overview,
-    addFood,
-    getFoodItem,
-    getFoodItems,
-    updateStatusCont
-};
+export { overview, addFood, getFoodItem, getFoodItems, updateStatusCont };

@@ -2,12 +2,12 @@ import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const isContributor = asyncHandler(async (req, _, next) => {
-    console.log("loged in as a contributor");
-    // console.log(req.user);
+    console.log("contributor check :::");
+    // console.log(req.user.role);
     if (req.user.role !== "contributor")
         throw new ApiError(
             403,
-            "user dont have permissions to access these resources"
+            `you dont have permissions to access these resources, user role is, ${req.user.role}`
         );
     next();
 });
@@ -17,7 +17,7 @@ const isNGO = asyncHandler(async (req, _, next) => {
     if (req.user.role !== "ngo")
         throw new ApiError(
             403,
-            "user dont have permissions to access these resources"
+            `you dont have permissions to access these resources, user role is, ${req.user.role}`
         );
     next();
 });

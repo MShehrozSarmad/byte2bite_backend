@@ -55,9 +55,11 @@ const getOTP = asyncHandler(async (req, res) => {
 
 const verifyOTP = asyncHandler(async (req, res) => {
     const { otp } = req.body;
-    const { email } = req.user;
+    const { email, isVerified } = req.user;
     const user = req.user;
     // console.log(user);
+
+    if (isVerified) throw new ApiError(400, "Acoount is already verified.");
 
     // console.log(otp, email);
     if (!otp || otp.length !== 6 || !/^\d{6}$/.test(otp)) {

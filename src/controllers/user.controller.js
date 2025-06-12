@@ -24,13 +24,13 @@ const completeProfile = asyncHandler(async (req, res) => {
         },
     };
 
-    console.log("value: client: ----------------", value);
+    // console.log("value: client: ----------------", value);
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
         new: true,
         runValidator: true,
     }).select("-password -refreshToken");
-    console.log("updated user: db: ----------------", updatedUser);
+    // console.log("updated user: db: ----------------", updatedUser);
 
     if (!updatedUser)
         throw new ApiError(404, "user not found, something went wrong");
