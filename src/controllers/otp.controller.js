@@ -9,7 +9,7 @@ import fs from "fs";
 import path from "path";
 
 const getOTP = asyncHandler(async (req, res) => {
-    const { method } = req.body;
+    const { method } = req.query;
     // console.log(method, req.body);
     const { email, isVerified } = req.user;
     // console.log(email);
