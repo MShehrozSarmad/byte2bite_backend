@@ -61,19 +61,30 @@ const getFoodItem = asyncHandler(async (req, res) => {
 // });
 
 const getFoodItems = asyncHandler(async (req, res) => {
-    // const food = await FoodItem.find().populate(
-    //     "contributor",
-    //     "-refreshToken -password"
-    // );
-
     const user = req.user;
-    const food = await FoodItem.find({ contributor: user._id });
-    // const food = await FoodItem.find({ contributor: user._id }).populate(
-    //     "contributor",
-    //     "-refreshToken -password"
-    // );
+    const { status } = req.query;
 
-    if (food.length == 0) throw new ApiError(400, "no food is listed");
+    const allowedStatus = [
+        "available",
+        "reserved",
+        "in_transit",
+        "donated",
+        "expired",
+    ];
+
+    let filter = { contributor: user._id };
+
+    if (status) {
+        if (!allowedStatus.includes(status)) {
+            throw new ApiError(400, "invalid status value");
+        } else {
+            filter.status = status;
+        }
+    }
+
+    const food = await FoodItem.find(filter);
+
+    if (food.length == 0) throw new ApiError(404, "no food is listed");
 
     res.status(200).json(
         new ApiResponse(200, food, "food items data fetched successfully")
