@@ -1,4 +1,5 @@
 import { Contribution } from "../models/contribution.model.js";
+import { FoodItem } from "../models/foodItem.model.js";
 import { Notification } from "../models/notification.model.js";
 import { ContributionService } from "../services/contribution.service.js";
 import { ApiError } from "../utils/apiError.js";
@@ -47,13 +48,27 @@ const makeRequest = asyncHandler(async (req, res) => {
 //     );
 // });
 
+const availableFoodItems = asyncHandler(async (req, res) => {
+    const food = await FoodItem.find({ status: "available" });
 
+    if (food.length == 0) throw new ApiError(404, "no food is listed");
+
+    res.status(200).json(
+        new ApiResponse(200, food, "food items data fetched successfully")
+    );
+});
 
 const updateStatusNGO = asyncHandler(async (req, res) => {
     const { contribution, status } = req.body;
     const user = req.user;
 
-    const allowedStatus = ["collecting", "collected", "distributing", "donated", "cancelled"];
+    const allowedStatus = [
+        "collecting",
+        "collected",
+        "distributing",
+        "donated",
+        "cancelled",
+    ];
 
     if (!status || !contribution)
         throw new ApiError(400, "contribution and status is required");
@@ -69,4 +84,4 @@ const updateStatusNGO = asyncHandler(async (req, res) => {
     );
 });
 
-export { makeRequest, updateStatusNGO};
+export { makeRequest, updateStatusNGO, availableFoodItems };
