@@ -14,8 +14,8 @@ const router = Router();
 // role based secure routes
 router.route("/overview").get(verifyJWT, isContributor, overview);
 router.route("/addfood").post(verifyJWT, isVerified, isContributor, addFood);
-router.route("/getfooditem").post(verifyJWT, isVerified, isContributor, getFoodItem);
-router.route("/getfooditems").post(verifyJWT, isVerified, isContributor, getFoodItems);
+router.route("/getfooditem").get(verifyJWT, isVerified, isContributor, getFoodItem);
+router.route("/getfooditems").get(verifyJWT, isVerified, isContributor, getFoodItems);
 // router.route("/update_reservation_request").patch(verifyJWT, isVerified, isContributor, cont_stts_response)
 router
     .route("/update_status")

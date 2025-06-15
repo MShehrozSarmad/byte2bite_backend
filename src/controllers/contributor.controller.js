@@ -35,7 +35,7 @@ const addFood = asyncHandler(async (req, res) => {
 });
 
 const getFoodItem = asyncHandler(async (req, res) => {
-    const { foodId } = req.body;
+    const { foodId } = req.query;
     console.log(foodId);
 
     if (!foodId) throw new ApiError(400, "food id is required");
