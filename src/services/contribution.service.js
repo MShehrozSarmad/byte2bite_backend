@@ -30,7 +30,7 @@ export const ContributionService = {
             pickupTime,
         });
 
-        const msg = `An NGO ${user.details.basicInfo.name} sent a food reservation request`;
+        const msg = `An NGO ${user.details.basicInfo.name} sent a food reservation request for food item ${foodItemRes.name}`;
 
         await Notification.create({
             recipient: foodItemRes.contributor,

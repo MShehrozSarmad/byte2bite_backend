@@ -4,6 +4,7 @@ import {
     // cont_stts_response,
     getFoodItem,
     getFoodItems,
+    getReservationRequests,
     overview,
     updateStatusCont,
 } from "../controllers/contributor.controller.js";
@@ -12,13 +13,17 @@ import { isContributor, isNGO } from "../middlewares/role.middleware.js";
 const router = Router();
 
 // role based secure routes
-router.route("/overview").get(verifyJWT, isContributor, overview);
-router.route("/addfood").post(verifyJWT, isVerified, isContributor, addFood);
-router.route("/getfooditem").get(verifyJWT, isVerified, isContributor, getFoodItem);
-router.route("/getfooditems").get(verifyJWT, isVerified, isContributor, getFoodItems);
-// router.route("/update_reservation_request").patch(verifyJWT, isVerified, isContributor, cont_stts_response)
-router
-    .route("/update_status")
-    .patch(verifyJWT, isVerified, isContributor, updateStatusCont);
+router.get("/overview", verifyJWT, isContributor, overview);
+router.get("/getfooditem", verifyJWT, isContributor, getFoodItem);
+router.get("/getfooditems", verifyJWT, isContributor, getFoodItems);
+router.get("/reservations", verifyJWT, isContributor, getReservationRequests);
+router.post("/addfood", verifyJWT, isVerified, isContributor, addFood);
+router.patch(
+    "/update_status",
+    verifyJWT,
+    isVerified,
+    isContributor,
+    updateStatusCont
+);
 
 export default router;

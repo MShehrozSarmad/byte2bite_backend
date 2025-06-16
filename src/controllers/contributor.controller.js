@@ -52,14 +52,6 @@ const getFoodItem = asyncHandler(async (req, res) => {
     );
 });
 
-// const getFoodItemsAvailable = asyncHandler(async(req, res) => {
-
-// });
-
-// const getFoodItemsDonated = asyncHandler(async(req, res) => {
-
-// });
-
 const getFoodItems = asyncHandler(async (req, res) => {
     const user = req.user;
     const { status } = req.query;
@@ -91,6 +83,44 @@ const getFoodItems = asyncHandler(async (req, res) => {
     );
 });
 
+const getReservationRequests = asyncHandler(async (req, res) => {
+    const user = req.user;
+    const { status } = req.query;
+
+    const allowedStatus = ["accepted", "rejected", "cancelled"];
+
+    const filter = { contributor: user._id };
+
+    if (status) {
+        if (!allowedStatus.includes(status)) {
+            throw new ApiError(404, "invalid status value");
+        } else {
+            filter.status = status;
+        }
+    }
+
+    const reservations = await Contribution.find(filter)
+        .populate({
+            path: "foodItem",
+        })
+        .populate({
+            path: "ngo",
+            select: "-password -refreshToken",
+        });
+
+    if (!reservations || reservations.length === 0) {
+        throw new ApiError(404, "No reservation requests found");
+    }
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            reservations,
+            "Reservation requests fetched successfully"
+        )
+    );
+});
+
 const updateStatusCont = asyncHandler(async (req, res) => {
     const { contribution, status } = req.body;
     const user = req.user;
@@ -111,4 +141,11 @@ const updateStatusCont = asyncHandler(async (req, res) => {
     );
 });
 
-export { overview, addFood, getFoodItem, getFoodItems, updateStatusCont };
+export {
+    overview,
+    addFood,
+    getFoodItem,
+    getFoodItems,
+    updateStatusCont,
+    getReservationRequests,
+};

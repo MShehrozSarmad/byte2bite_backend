@@ -13,40 +13,20 @@ const makeRequest = asyncHandler(async (req, res) => {
     if (!foodItem || !pickupTime)
         throw new ApiError(400, "foodItem and pickupTime is required");
 
-    await ContributionService.createContribution(foodItem, pickupTime, user);
+    const contribution = await ContributionService.createContribution(
+        foodItem,
+        pickupTime,
+        user
+    );
 
     res.status(200).json(
-        new ApiResponse(200, null, "reservaion request sent successfully")
+        new ApiResponse(
+            200,
+            contribution,
+            "reservaion request sent successfully"
+        )
     );
 });
-
-// const cont_stts_collecting = asyncHandler(async (req, res) => {
-//     const { requestId, pickupTime } = req.body;
-
-//     if (!requestId || !pickupTime)
-//         throw new ApiError(
-//             400,
-//             "Missing required fields: requestId and pickupTime"
-//         );
-
-//     const updatedReq = await Contribution.findByIdAndUpdate(
-//         requestId,
-//         { pickupTime, status: "collecting" },
-//         { new: true }
-//     );
-//     if (!updatedReq) throw new ApiError(404, "Request not found");
-
-//     await Notification.create({
-//         recipient: updatedReq.contributor,
-//         type: "status update",
-//         contribution: updatedReq._id,
-//         message: "Your food is now being collected.",
-//     });
-
-//     res.status(200).json(
-//         new ApiResponse(200, null, "status updated successfully")
-//     );
-// });
 
 const availableFoodItems = asyncHandler(async (req, res) => {
     const food = await FoodItem.find({ status: "available" });
