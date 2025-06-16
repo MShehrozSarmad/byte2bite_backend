@@ -83,11 +83,31 @@ const getFoodItems = asyncHandler(async (req, res) => {
     );
 });
 
+const updateStatusCont = asyncHandler(async (req, res) => {
+    const { contribution, status } = req.body;
+    const user = req.user;
+
+    const allowedStatus = ["accepted", "rejected", "cancelled"];
+
+    if (!status || !contribution)
+        throw new ApiError(400, "contribution and status is required");
+
+    if (!allowedStatus.includes(status)) {
+        throw new ApiError(400, "Invalid status");
+    }
+
+    await ContributionService.updateStatus(contribution, status, user);
+
+    res.status(200).json(
+        new ApiResponse(200, null, "status updated successfully")
+    );
+});
+
 const getReservationRequests = asyncHandler(async (req, res) => {
     const user = req.user;
     const { status } = req.query;
 
-    const allowedStatus = ["accepted", "rejected", "cancelled"];
+    const allowedStatus = ["pending", "accepted", "rejected", "cancelled"];
 
     const filter = { contributor: user._id };
 
@@ -97,6 +117,8 @@ const getReservationRequests = asyncHandler(async (req, res) => {
         } else {
             filter.status = status;
         }
+    } else {
+        filter.status = { $in: allowedStatus };
     }
 
     const reservations = await Contribution.find(filter)
@@ -121,23 +143,47 @@ const getReservationRequests = asyncHandler(async (req, res) => {
     );
 });
 
-const updateStatusCont = asyncHandler(async (req, res) => {
-    const { contribution, status } = req.body;
+const activeContributions = asyncHandler(async (req, res) => {
     const user = req.user;
+    const { status } = req.query;
 
-    const allowedStatus = ["accepted", "rejected", "cancelled"];
+    const allowedStatus = [
+        "collecting",
+        "collected",
+        "distributing",
+        "donated",
+    ];
+    const filter = { contributor: user._id };
 
-    if (!status || !contribution)
-        throw new ApiError(400, "contribution and status is required");
-
-    if (!allowedStatus.includes(status)) {
-        throw new ApiError(400, "Invalid status");
+    if (status) {
+        if (!allowedStatus.includes(status)) {
+            throw new ApiError(404, "invalid status value");
+        } else {
+            filter.status = status;
+        }
+    } else {
+        filter.status = { $in: allowedStatus };
     }
 
-    await ContributionService.updateStatus(contribution, status, user);
+    const reservations = await Contribution.find(filter)
+        .populate({
+            path: "foodItem",
+        })
+        .populate({
+            path: "ngo",
+            select: "-password -refreshToken",
+        });
+
+    if (!reservations || reservations.length === 0) {
+        throw new ApiError(404, "No active contribution found");
+    }
 
     res.status(200).json(
-        new ApiResponse(200, null, "status updated successfully")
+        new ApiResponse(
+            200,
+            reservations,
+            "Reservation requests fetched successfully"
+        )
     );
 });
 
@@ -148,4 +194,5 @@ export {
     getFoodItems,
     updateStatusCont,
     getReservationRequests,
+    activeContributions
 };

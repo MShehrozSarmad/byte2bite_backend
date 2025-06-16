@@ -18,6 +18,6 @@ const router = Router();
 
 router.get("/getFoodItems", verifyJWT, isNGO, availableFoodItems);
 router.post("/reservation_req", verifyJWT, isVerified, isNGO, makeRequest);
-router.post("/update_status", verifyJWT, isVerified, isNGO, updateStatusNGO);
+router.patch("/update_status", verifyJWT, isVerified, isNGO, updateStatusNGO);
 
 export default router;
