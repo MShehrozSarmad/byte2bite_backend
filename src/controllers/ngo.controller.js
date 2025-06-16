@@ -64,4 +64,57 @@ const updateStatusNGO = asyncHandler(async (req, res) => {
     );
 });
 
-export { makeRequest, updateStatusNGO, availableFoodItems };
+const activeContributions = asyncHandler(async (req, res) => {
+    const user = req.user;
+    const { status } = req.query;
+
+    const allowedStatus = [
+        "pending",
+        "accepted",
+        "rejected",
+        "collecting",
+        "collected",
+        "distributing",
+        "donated",
+        "cancelled",
+    ];
+    const filter = { ngo: user._id };
+
+    if (status) {
+        if (!allowedStatus.includes(status)) {
+            throw new ApiError(404, "invalid status value");
+        } else {
+            filter.status = status;
+        }
+    } else {
+        filter.status = { $in: allowedStatus };
+    }
+
+    const reservations = await Contribution.find(filter)
+        .populate({
+            path: "foodItem",
+        })
+        .populate({
+            path: "contributor",
+            select: "-password -refreshToken",
+        });
+
+    if (!reservations || reservations.length === 0) {
+        throw new ApiError(404, "No active contribution found");
+    }
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            reservations,
+            "contributions data fetched successfully"
+        )
+    );
+});
+
+export {
+    makeRequest,
+    updateStatusNGO,
+    availableFoodItems,
+    activeContributions,
+};

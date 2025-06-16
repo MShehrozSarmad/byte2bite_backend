@@ -182,7 +182,7 @@ const activeContributions = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             reservations,
-            "Reservation requests fetched successfully"
+            "contributions data fetched successfully"
         )
     );
 });
