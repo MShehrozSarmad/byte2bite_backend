@@ -5,6 +5,7 @@ import { ContributionService } from "../services/contribution.service.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import haversine from "haversine-distance";
 
 const makeRequest = asyncHandler(async (req, res) => {
     const { foodItem, pickupTime } = req.body;
@@ -31,10 +32,37 @@ const makeRequest = asyncHandler(async (req, res) => {
 const availableFoodItems = asyncHandler(async (req, res) => {
     const food = await FoodItem.find({ status: "available" });
 
-    if (food.length == 0) throw new ApiError(404, "no food is listed");
+    if (food.length === 0) throw new ApiError(404, "no food is listed");
+
+    // Get NGO coordinates
+    const ngoCoords = req.user.details.address.coordinates;
+    if (
+        !ngoCoords ||
+        ngoCoords.latitude == null ||
+        ngoCoords.longitude == null
+    ) {
+        throw new ApiError(400, "NGO coordinates not found");
+    }
+
+    // Calculate distance for each food item
+    const foodWithDistance = food.map((item) => {
+        const foodCoords = item.location;
+        const distance = haversine(
+            { lat: ngoCoords.latitude, lon: ngoCoords.longitude },
+            { lat: foodCoords.latitude, lon: foodCoords.longitude }
+        );
+        return { ...item.toObject(), distance };
+    });
+
+    // Sort by distance (nearest first)
+    foodWithDistance.sort((a, b) => a.distance - b.distance);
 
     res.status(200).json(
-        new ApiResponse(200, food, "food items data fetched successfully")
+        new ApiResponse(
+            200,
+            foodWithDistance,
+            "food items data fetched successfully"
+        )
     );
 });
 
