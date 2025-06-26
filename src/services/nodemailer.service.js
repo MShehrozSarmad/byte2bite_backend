@@ -14,10 +14,12 @@ import { ApiError } from "../utils/apiError.js";
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_PORT == 465,
     auth: {
         user: process.env.SMTP_USERNAME,
         pass: process.env.SMTP_PASSWORD,
     },
+    debug: true,
 });
 
 const sendEmail = async (email, subject, message) => {
@@ -31,8 +33,8 @@ const sendEmail = async (email, subject, message) => {
         console.log("email sent", res);
         return res;
     } catch (error) {
-        console.error("Error sending OTP via email:", error);
-        throw new ApiError(503, "Failed to send OTP via email");
+        console.error("Error sending email:", error);
+        throw new ApiError(503, "Failed to send email");
     }
 };
 
